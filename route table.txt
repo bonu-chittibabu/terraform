@@ -1,0 +1,10 @@
+resource "aws_route_table" "rt_terravpc" {
+vpc_id = aws_vpc.terravpc.id
+route {
+cidr_block = "0.0.0.0/0"
+gateway_id = aws_internet_gateway.terraigw.id
+}
+tags = {
+Name = "rt_terravpc"
+}
+}

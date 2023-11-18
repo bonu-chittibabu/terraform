@@ -1,0 +1,31 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
+    }
+  }
+
+  required_version = ">= 1.2.0"
+}
+provider "aws" {
+region = "us-east-1"
+profile = "default"
+}
+resource "aws_vpc" "TerraVpc" {
+cidr_block = "10.21.0.0/16"
+enable_dns_support = "true"
+enable_dns_hostnames = "true"
+tags = {
+Name = "TerraVpc"
+}
+}
+resource "aws_subnet" "terravpc-subnet1" {
+vpc_id = aws_vpc.TerraVpc.id
+cidr_block = "10.21.6.0/24"
+availability_zone = "us-east-1a"
+map_public_ip_on_launch = "true"
+tags = {
+Name = "TerraVpc-subnet1"
+}
+}
