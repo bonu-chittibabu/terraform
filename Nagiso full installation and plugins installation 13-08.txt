@@ -1,0 +1,145 @@
+sudo apt-get update
+sudo apt install -y autoconf bc gawk dc build-essential gcc libc6 make wget unzip apache2 php libapache2-mod-php libgd-dev libmcrypt-dev make libssl-dev snmp libnet-snmp-perl gettext
+mkdir nagios
+cd nagios
+wget https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.6.tar.gz
+tar -xvf nagios-4.4.6.tar.gz
+cd nagios-4.4.6
+sudo ./configure --with-httpd-conf=/etc/apache2/sites-enabled
+sudo make all
+sudo make install-groups-users
+sudo usermod -a -G nagios www-data
+sudo make install
+sudo make install-init
+sudo make install-commandmode
+sudo make install-config
+sudo make install-webconf
+sudo a2enmod rewrite cgi
+sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+cd ..
+sudo apt install monitoring-plugins nagios-nrpe-plugin -y
+cd /usr/local/nagios/etc
+vim nagio.cfg
+remove # in 50 to 54 line
+sudo mkdir servers printers switches routers
+sudo vim resource.cfg
+add # in 25 th line
+addd this in 26 line (  $USER1$=/usr/lib/nagios/plugins  )
+cd objects
+sudo vim contacts.cfg 
+add email id in the  place of nagios@localhost 
+sudo vim commands.cfg
+enter :$ 
+define command{
+        command_name check_nrpe
+		command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+save and exit
+cd ~
+sudo ufw status
+sudo ufw allow apache
+sudo ufw status
+sudo ufw reload
+sudo systemctl restart apache2
+sudo systemctl restart nagios
+sudo systemctl enable apache2
+sudo systemctl enable nagios
+sudo systemctl status apache2
+sudo systemctl status nagios
+ip/nagios
+
+
+
+
+
+
+
+
+Nagios plugins installation in host machine
+
+sudo apt-get update
+sudo apt-get install nagios-nrpe-server nagios-plugins 
+sudo nano /etc/nagios/nrpe.cfg
+enter nagios server address
+sudo /etc/init.d/nagios-nrpe-server restart
+
+
+on nagios server:
+
+cd /usr/local/nagios/objects
+vi host1.cfg
+ paste here and save
+cd ..
+
+sudo nano nagios.cfg
+paste the below line no 33
+cfg_file=/usr/local/nagios/etc/objects/host1.cfg
+sudo systemctl restart nagios
+
+
+
+Create monitoring service in Nagios Host
+on slave server 
+sudo apt install apache2
+
+on nagios server 
+nano host1.cfg
+define service {
+
+    use                     generic-service           ; Name of service template to use
+    host_name               slave1
+    service_description     Check Apache
+    check_command           check_http
+}
+sudo systemctl restart nagios
+
+Create monitoring service in remote NRPE client:
+
+on nagios server
+cd /usr/local/nagios/etc/objects/command.cfg
+paste below the matter below command_line check_http
+
+define command {
+
+    command_name    test_http
+    command_line    $USER1$/check_http -I $HOSTADDRESS$ $ARG1$
+}
+
+vi host1.cfg
+define service {
+
+    use                     generic-service           ; Name of service template to use
+    host_name               slave1
+    service_description     Check Apache test
+    check_command           test_http
+}
+save and exit
+
+vi host1.cfg
+define service {
+
+    use                     generic-service           ; Name of service template to use
+    host_name               slave1
+    service_description     Check Apache
+    check_command           check_http
+    retry_interval          1
+    check_interval          1
+}
+save and exit
+
+sudo systemctl restart nagios
+
+
+
+sudo vim localhost.cfg
+current user12
+sudo nano localhost.cfg
+current user12
+sudo systemctl restart nagios
+cd ..
+sudo nano nagios.cfg
+line 38 remove # ( to get windows server)
+sudo systemctl restart nagios
+sudo nano nagios.cfg
+line 38 add #
+sudo systemctl nagios
